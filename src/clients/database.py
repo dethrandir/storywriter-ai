@@ -1,18 +1,23 @@
+import os
+
 import asyncpg
+from dotenv import load_dotenv
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
+load_dotenv()
+
 
 @dataclass
 class DatabaseConfig:
-    host: str = "localhost"
-    port: int = 7432
-    user: str = "postgres"
-    password: str = "postgres"
-    database: str = "fastapi_project"
-    min_size: int = 2
-    max_size: int = 10
+    host: str = os.getenv("POSTGRES_HOST", "localhost")
+    port: int = int(os.getenv("POSTGRES_PORT", "7432"))
+    user: str = os.getenv("POSTGRES_USER", "postgres")
+    password: str = os.getenv("POSTGRES_PASSWORD", "postgres")
+    database: str = os.getenv("POSTGRES_DB", "fastapi_project")
+    min_size: int = int(os.getenv("POSTGRES_POOL_MIN_SIZE", "2"))
+    max_size: int = int(os.getenv("POSTGRES_POOL_MAX_SIZE", "10"))
 
 
 class Database:
