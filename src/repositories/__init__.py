@@ -1,4 +1,5 @@
 from src.repositories import (
+    chapter_plan_repo,
     character_repo,
     chapter_repo,
     conflict_repo,

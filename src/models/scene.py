@@ -12,3 +12,4 @@ class Scene(BaseModel):
     characters: list[str]
     conflicts: list[str] # conflicts
     events: list[str] # event ids
+    summary: str # sahnenin kisa durum anlatisi/ozeti (uzun prose degil; chapter olusturulurken bu ozet kullanilir)

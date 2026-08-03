@@ -9,6 +9,7 @@ async def init_db():
             CREATE TABLE IF NOT EXISTS characters (
                 id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                 uuid TEXT NOT NULL,
+                story_id TEXT NOT NULL DEFAULT '',
                 name TEXT NOT NULL,
                 full_name TEXT NOT NULL,
                 age TEXT NOT NULL,
@@ -25,8 +26,16 @@ async def init_db():
 
         await conn.execute(
             """
+            ALTER TABLE characters
+                ADD COLUMN IF NOT EXISTS story_id TEXT NOT NULL DEFAULT '';
+            """
+        )
+
+        await conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS settings (
                 id TEXT PRIMARY KEY,
+                story_id TEXT NOT NULL DEFAULT '',
                 name TEXT NOT NULL,
                 style TEXT NOT NULL DEFAULT '',
                 time TEXT NOT NULL DEFAULT '',
@@ -39,6 +48,13 @@ async def init_db():
                 info JSONB NOT NULL DEFAULT '[]',
                 experience JSONB NOT NULL DEFAULT '[]'
             );
+            """
+        )
+
+        await conn.execute(
+            """
+            ALTER TABLE settings
+                ADD COLUMN IF NOT EXISTS story_id TEXT NOT NULL DEFAULT '';
             """
         )
 
@@ -98,12 +114,23 @@ async def init_db():
             """
             CREATE TABLE IF NOT EXISTS scenes (
                 id TEXT PRIMARY KEY,
+                story_id TEXT NOT NULL DEFAULT '',
                 title TEXT NOT NULL,
                 setting TEXT NOT NULL DEFAULT '',
                 characters JSONB NOT NULL DEFAULT '[]',
                 conflicts JSONB NOT NULL DEFAULT '[]',
-                events JSONB NOT NULL DEFAULT '[]'
+                events JSONB NOT NULL DEFAULT '[]',
+                summary TEXT NOT NULL DEFAULT ''
             );
+            """
+        )
+
+        await conn.execute(
+            """
+            ALTER TABLE scenes
+                ADD COLUMN IF NOT EXISTS story_id TEXT NOT NULL DEFAULT '';
+            ALTER TABLE scenes
+                ADD COLUMN IF NOT EXISTS summary TEXT NOT NULL DEFAULT '';
             """
         )
 
@@ -111,6 +138,7 @@ async def init_db():
             """
             CREATE TABLE IF NOT EXISTS events (
                 id TEXT PRIMARY KEY,
+                story_id TEXT NOT NULL DEFAULT '',
                 title TEXT NOT NULL,
                 description TEXT NOT NULL DEFAULT '',
                 date TEXT NOT NULL DEFAULT '',
@@ -124,11 +152,26 @@ async def init_db():
 
         await conn.execute(
             """
+            ALTER TABLE events
+                ADD COLUMN IF NOT EXISTS story_id TEXT NOT NULL DEFAULT '';
+            """
+        )
+
+        await conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS conflicts (
                 id TEXT PRIMARY KEY,
+                story_id TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
                 effects JSONB NOT NULL DEFAULT '[]'
             );
+            """
+        )
+
+        await conn.execute(
+            """
+            ALTER TABLE conflicts
+                ADD COLUMN IF NOT EXISTS story_id TEXT NOT NULL DEFAULT '';
             """
         )
 
@@ -140,6 +183,40 @@ async def init_db():
                 title TEXT NOT NULL,
                 content TEXT NOT NULL DEFAULT ''
             );
+            """
+        )
+
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS chapter_plans (
+                id TEXT PRIMARY KEY,
+                story_id TEXT NOT NULL,
+                index INTEGER NOT NULL DEFAULT 0,
+                title TEXT NOT NULL DEFAULT '',
+                goal TEXT NOT NULL DEFAULT '',
+                settings JSONB NOT NULL DEFAULT '[]',
+                characters JSONB NOT NULL DEFAULT '[]',
+                conflicts JSONB NOT NULL DEFAULT '[]',
+                events JSONB NOT NULL DEFAULT '[]',
+                scenes JSONB NOT NULL DEFAULT '[]',
+                narration JSONB NOT NULL DEFAULT '[]',
+                planned_summary TEXT NOT NULL DEFAULT '',
+                description TEXT NOT NULL DEFAULT '',
+                summary TEXT NOT NULL DEFAULT '',
+                content TEXT NOT NULL DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'planned'
+            );
+            """
+        )
+
+        await conn.execute(
+            """
+            ALTER TABLE chapter_plans
+                ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT '';
+            ALTER TABLE chapter_plans
+                ADD COLUMN IF NOT EXISTS summary TEXT NOT NULL DEFAULT '';
+            ALTER TABLE chapter_plans
+                ADD COLUMN IF NOT EXISTS content TEXT NOT NULL DEFAULT '';
             """
         )
 
@@ -300,7 +377,8 @@ async def init_db():
                     'setting', s.setting,
                     'characters', s.characters,
                     'conflicts', s.conflicts,
-                    'events', s.events
+                    'events', s.events,
+                    'summary', s.summary
                 ) INTO result
                 FROM scenes s WHERE s.id = _id;
                 RETURN result;

@@ -1,3 +1,5 @@
+import os
+
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from src.repositories import repos
@@ -6,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 qdrant = AsyncQdrantClient(host="localhost", port=7033)
 openai_client = AsyncOpenAI(
-    api_key="pa-W5t_s4tAc4fT809Vn4mM-C4eOI_Q9KEo03iTGufLE7B",
+    api_key=os.getenv("VOYAGE_API_KEY", "") or "not-needed",
     base_url="https://api.voyageai.com/v1"
 )
 

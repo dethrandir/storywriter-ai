@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 from src.clients.database import db
 from src.repositories import story_metadata_repo, world_repo, chapter_repo
@@ -6,6 +7,15 @@ from src.repositories import story_metadata_repo, world_repo, chapter_repo
 
 async def serialize(sid: str) -> dict | None:
     return await db.fetchval("SELECT get_story($1)", sid)
+
+
+async def find_by_chapter(chapter_id: str) -> dict | None:
+    """Bu bölümü referanslayan hikayeyi döndürür (chapters jsonb üzerinden)."""
+    row = await db.fetchrow(
+        "SELECT * FROM stories WHERE chapters::jsonb @> $1",
+        json.dumps([chapter_id]),
+    )
+    return dict(row) if row else None
 
 
 async def resolve_text(sid: str) -> str | None:

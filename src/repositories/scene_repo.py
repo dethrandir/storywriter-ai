@@ -15,6 +15,8 @@ async def resolve_text(sid: str) -> str | None:
     lines = [f"Scene: {s['title']}"]
     if s['setting']:
         lines.append(f"Setting: {s['setting']}")
+    if s['summary']:
+        lines.append(f"Summary: {s['summary']}")
     if s['characters']:
         char_texts = await asyncio.gather(*[character_repo.resolve_text(cid) for cid in s['characters']])
         lines.append("Characters:\n  " + "\n  ".join(t.replace("\n", "\n  ") for t in char_texts if t))
