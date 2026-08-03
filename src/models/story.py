@@ -11,7 +11,7 @@ class Story(BaseModel):
     # belki world vb. metadata da degil burada olmali, metadata daha cok metadata olarak kalmali.
     chapters: list[str]
 
-    def serialize(self): -> str:
+    def serialize(self) -> str:
         """
         Sonradan ekleyecegim function.
         mesela kitabi dosyaya yazdirmak icin. cikti vb. almak icin.
